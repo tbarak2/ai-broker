@@ -1,0 +1,45 @@
+# Django
+Django==5.1.4
+djangorestframework==3.15.2
+django-cors-headers==4.6.0
+django-environ==0.11.2
+django-extensions==3.2.3
+
+# Database
+psycopg2-binary==2.9.10
+dj-database-url==2.3.0
+
+# Celery
+celery==5.4.0
+django-celery-beat==2.7.0
+django-celery-results==2.5.1
+redis==5.2.1
+
+# AI Providers
+anthropic==0.40.0
+openai==1.58.1
+google-generativeai==0.8.3
+
+# Market Data
+alpaca-py==0.35.0
+yfinance==0.2.49
+ta==0.11.0
+pandas==2.2.3
+numpy==2.2.0
+
+# Telegram
+python-telegram-bot==21.9
+
+# News / Sentiment
+requests==2.32.3
+
+# Utilities
+python-decouple==3.8
+Pillow==11.0.0
+
+# Development
+django-debug-toolbar==4.4.6
+pytest==8.3.4
+pytest-django==4.9.0
+factory-boy==3.3.1
+responses==0.25.3
