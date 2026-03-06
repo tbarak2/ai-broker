@@ -137,7 +137,7 @@ TECHNICAL INDICATORS:
 FUNDAMENTALS:
 - P/E ratio: {context.pe_ratio or 'N/A'}
 - EPS: {context.eps or 'N/A'}
-- Market Cap: ${context.market_cap:,} if {context.market_cap} else N/A
+- Market Cap: {f'${context.market_cap:,}' if context.market_cap else 'N/A'}
 - Dividend Yield: {f'{context.dividend_yield:.2%}' if context.dividend_yield else 'N/A'}
 - Sector: {context.sector or 'N/A'}
 {news_text}

@@ -8,6 +8,6 @@ def get_live_provider() -> BaseDataProvider:
 
 
 def get_historical_provider() -> BaseDataProvider:
-    """Returns yfinance provider for historical data and fundamentals."""
-    from .yfinance_provider import YFinanceProvider
-    return YFinanceProvider()
+    """Returns Alpaca for historical OHLCV (yfinance as fallback for fundamentals)."""
+    from .alpaca_provider import AlpacaProvider
+    return AlpacaProvider()

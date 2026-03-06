@@ -20,7 +20,7 @@ export function usePortfolio(id: number | null) {
 export function usePositions(portfolioId: number | null) {
   return useQuery({
     queryKey: ["positions", portfolioId],
-    queryFn: () => portfolioApi.positions(portfolioId!).then((r) => r.data.results),
+    queryFn: () => portfolioApi.positions(portfolioId!).then((r) => r.data),
     enabled: portfolioId != null,
     refetchInterval: 60_000,
   });

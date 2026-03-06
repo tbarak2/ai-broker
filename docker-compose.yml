@@ -9,8 +9,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-broker_db}
       POSTGRES_USER: ${POSTGRES_USER:-broker}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-broker}
+    # host port changed from 5432 to avoid conflicts with local Postgres
     ports:
-      - "5432:5432"
+      - "55432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-broker}"]
       interval: 5s
@@ -33,11 +34,11 @@ services:
       dockerfile: Dockerfile
     command: >
       sh -c "python manage.py migrate --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
+             python manage.py runserver 0.0.0.0:8010"
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      - "8010:8010"
     env_file:
       - .env
     depends_on:
@@ -110,7 +111,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
+      - VITE_API_BASE_URL=http://localhost:8010/api
+      - BACKEND_URL=http://backend:8010
     depends_on:
       - backend
 
