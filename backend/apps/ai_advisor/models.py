@@ -96,6 +96,14 @@ class StrategyConfig(models.Model):
     analysis_interval_minutes = models.IntegerField(default=30)
     watchlist = models.JSONField(default=list)  # ["AAPL", "TSLA", ...]
     is_active = models.BooleanField(default=True)
+    auto_trade = models.BooleanField(
+        default=False,
+        help_text="When enabled, high-confidence AI recommendations are executed automatically.",
+    )
+    auto_trade_min_confidence = models.DecimalField(
+        max_digits=4, decimal_places=3, default=Decimal("0.700"),
+        help_text="Minimum confidence (0–1) required for auto-execution.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

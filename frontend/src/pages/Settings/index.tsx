@@ -75,6 +75,8 @@ export default function Settings() {
     max_position_size_pct: string;
     analysis_interval_minutes: number;
     watchlist: string[];
+    auto_trade: boolean;
+    auto_trade_min_confidence: string;
   } | null>(null);
 
   // Populate form when strategy loads
@@ -85,6 +87,8 @@ export default function Settings() {
       max_position_size_pct: strategy.max_position_size_pct,
       analysis_interval_minutes: strategy.analysis_interval_minutes,
       watchlist: strategy.watchlist,
+      auto_trade: strategy.auto_trade ?? false,
+      auto_trade_min_confidence: strategy.auto_trade_min_confidence ?? "0.700",
     });
   }
 
@@ -263,6 +267,69 @@ export default function Settings() {
                 />
               </div>
 
+              {/* Auto-trade */}
+              <div className="border border-gray-700 rounded-xl p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-white">Auto Management</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      AI will execute trades automatically when confidence meets the threshold.
+                      Use with caution.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={strategyForm.auto_trade}
+                    onClick={() =>
+                      setStrategyForm({ ...strategyForm, auto_trade: !strategyForm.auto_trade })
+                    }
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                      strategyForm.auto_trade ? "bg-brand-500" : "bg-gray-600"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        strategyForm.auto_trade ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {strategyForm.auto_trade && (
+                  <div>
+                    <label className="text-xs text-gray-400 block mb-1">
+                      Minimum confidence to auto-execute:{" "}
+                      <span className="text-white font-medium">
+                        {Math.round(parseFloat(strategyForm.auto_trade_min_confidence) * 100)}%
+                      </span>
+                    </label>
+                    <input
+                      type="range"
+                      min="50"
+                      max="99"
+                      step="1"
+                      value={Math.round(parseFloat(strategyForm.auto_trade_min_confidence) * 100)}
+                      onChange={(e) =>
+                        setStrategyForm({
+                          ...strategyForm,
+                          auto_trade_min_confidence: (parseInt(e.target.value) / 100).toFixed(3),
+                        })
+                      }
+                      className="w-full accent-brand-500"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>50% (permissive)</span>
+                      <span>99% (strict)</span>
+                    </div>
+                    <p className="text-xs text-yellow-400 mt-2">
+                      Warning: Auto management bypasses your manual review. Only enable if you trust
+                      the AI strategy.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Watchlist */}
               <div>
                 <p className="text-sm text-gray-400 mb-2">Watchlist</p>
@@ -294,6 +361,8 @@ export default function Settings() {
                     max_position_size_pct: "10",
                     analysis_interval_minutes: 30,
                     watchlist: [],
+                    auto_trade: false,
+                    auto_trade_min_confidence: "0.700",
                   })
                 }
                 className="btn-primary"

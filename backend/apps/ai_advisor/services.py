@@ -198,6 +198,24 @@ class AIAdvisorService:
                     provider_name, rec.action, symbol,
                     rec.reasoning[:60], float(rec.confidence) * 100,
                 )
+
+                # Auto-trade: execute immediately if enabled and confidence is sufficient
+                if (
+                    strategy_config.auto_trade
+                    and rec.action in (AIRecommendation.Action.BUY, AIRecommendation.Action.SELL)
+                    and rec.quantity_suggested > 0
+                    and rec.confidence >= strategy_config.auto_trade_min_confidence
+                ):
+                    try:
+                        self.approve_recommendation(rec.id)
+                        logger.info(
+                            "[auto-trade] Auto-executed %s %s x%s (%.0f%% confidence)",
+                            rec.action, symbol, rec.quantity_suggested,
+                            float(rec.confidence) * 100,
+                        )
+                    except Exception as auto_exc:
+                        logger.error("Auto-trade execution failed for rec %s: %s", rec.id, auto_exc)
+
             except Exception as exc:
                 logger.error(
                     "AI analysis failed for %s/%s: %s", provider_name, symbol, exc

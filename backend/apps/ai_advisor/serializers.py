@@ -26,6 +26,7 @@ class StrategyConfigSerializer(serializers.ModelSerializer):
             "id", "portfolio", "ai_providers", "strategies",
             "risk_tolerance", "max_position_size_pct",
             "analysis_interval_minutes", "watchlist", "is_active",
+            "auto_trade", "auto_trade_min_confidence",
             "created_at", "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]

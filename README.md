@@ -7,6 +7,7 @@ An AI-powered paper trading simulator that analyzes real market data and provide
 ## Features
 
 - **AI Recommendations** — Claude analyzes RSI, MACD, Bollinger Bands, and EMA indicators to suggest BUY / SELL / HOLD actions
+- **Auto Management** — Optionally let the AI execute trades automatically when its confidence exceeds a configurable threshold (no manual approval needed)
 - **Real Market Data** — Live prices and historical OHLCV via Alpaca Markets API
 - **Paper Trading** — Execute approved orders without real money; track P&L and positions
 - **Telegram Bot** — Get notified on new recommendations and trade executions
@@ -47,11 +48,15 @@ cp .env.example .env   # then fill in your API keys
 ### 3. Start
 
 ```bash
-docker compose up -d --build
+./deploy.sh          # start (uses existing images)
+./deploy.sh --build  # rebuild images then start
+./deploy.sh --down   # stop everything, then restart fresh
 ```
 
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8010/api/
+
+The script starts all services, waits for the backend to be ready, and runs any pending database migrations automatically.
 
 ## Usage
 
@@ -61,6 +66,17 @@ docker compose up -d --build
 4. Review recommendations and **Approve** or **Reject** them
 5. Approved orders are executed automatically by the paper broker
 6. Track your portfolio on the **Dashboard** and **Portfolio** pages
+
+### Auto Management (optional)
+
+Enable fully autonomous trading in **Settings → AI Strategy → Auto Management**:
+
+- Toggle **Auto Management** on
+- Set a **minimum confidence threshold** (default 70%, range 50–99%)
+- Any BUY/SELL recommendation whose confidence meets the threshold will be executed immediately — no manual approval required
+- HOLD and REBALANCE recommendations are never auto-executed
+
+> **Note:** Auto management bypasses your manual review step. Only enable it if you trust the configured AI strategy and risk settings.
 
 ## Project Structure
 
