@@ -1,9 +1,50 @@
 import axios from "axios";
+import { useAppStore } from "../store";
 
 const api = axios.create({
   baseURL: "/api",
   headers: { "Content-Type": "application/json" },
 });
+
+// ─── Auth interceptors ───────────────────────────────────────────────────────
+
+// Attach access token to every request
+api.interceptors.request.use((config) => {
+  const token = useAppStore.getState().accessToken;
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// On 401 → try to refresh; on failure, clear auth and redirect to /login
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      const { refreshToken, setTokens, clearAuth } = useAppStore.getState();
+      if (refreshToken) {
+        try {
+          const res = await axios.post("/api/auth/token/refresh/", {
+            refresh: refreshToken,
+          });
+          const { access, refresh } = res.data;
+          const user = useAppStore.getState().user!;
+          setTokens(access, refresh ?? refreshToken, user);
+          original.headers.Authorization = `Bearer ${access}`;
+          return api(original);
+        } catch {
+          clearAuth();
+          window.location.href = "/login";
+        }
+      } else {
+        clearAuth();
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -97,6 +138,8 @@ export interface StrategyConfig {
   analysis_interval_minutes: number;
   watchlist: string[];
   is_active: boolean;
+  auto_trade: boolean;
+  auto_trade_min_confidence: string;
 }
 
 export interface Quote {
@@ -116,6 +159,34 @@ export interface PaginatedResponse<T> {
   previous: string | null;
   results: T[];
 }
+
+// ─── Auth API (uses plain axios — no token needed) ────────────────────────────
+
+export const authApi = {
+  login: (username: string, password: string) =>
+    axios.post<{
+      totp_required?: boolean;
+      setup_required?: boolean;
+      partial_token: string;
+    }>("/api/auth/login/", { username, password }),
+
+  totpSetup: (partialToken: string) =>
+    axios.get<{ secret: string; qr_code: string; partial_token: string }>(
+      `/api/auth/totp/setup/?partial_token=${partialToken}`
+    ),
+
+  totpActivate: (partialToken: string, code: string) =>
+    axios.post<{ access: string; refresh: string; user: { id: number; username: string; email: string } }>(
+      "/api/auth/totp/activate/",
+      { partial_token: partialToken, code }
+    ),
+
+  totpVerify: (partialToken: string, code: string) =>
+    axios.post<{ access: string; refresh: string; user: { id: number; username: string; email: string } }>(
+      "/api/auth/totp/verify/",
+      { partial_token: partialToken, code }
+    ),
+};
 
 // ─── Portfolio API ────────────────────────────────────────────────────────────
 

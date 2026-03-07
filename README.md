@@ -6,6 +6,7 @@ An AI-powered paper trading simulator that analyzes real market data and provide
 
 ## Features
 
+- **Secure Login + 2FA** — JWT authentication with mandatory Google Authenticator (TOTP) two-factor auth
 - **AI Recommendations** — Claude analyzes RSI, MACD, Bollinger Bands, and EMA indicators to suggest BUY / SELL / HOLD actions
 - **Auto Management** — Optionally let the AI execute trades automatically when its confidence exceeds a configurable threshold (no manual approval needed)
 - **Real Market Data** — Live prices and historical OHLCV via Alpaca Markets API
@@ -58,14 +59,27 @@ cp .env.example .env   # then fill in your API keys
 
 The script starts all services, waits for the backend to be ready, and runs any pending database migrations automatically.
 
+### 4. Create your user account
+
+There is no public registration. Create your account via the Django admin:
+
+```bash
+docker exec -it ai_broker-backend-1 python manage.py createsuperuser
+```
+
+Follow the prompts to set a username and password.
+
 ## Usage
 
-1. Open http://localhost:5173
-2. Go to **Settings** → add stocks to your watchlist (e.g. AAPL, MSFT, NVDA)
+1. Open http://localhost:5173 — you'll be redirected to the login page
+2. Sign in with your username and password
+3. **First login:** scan the QR code with Google Authenticator, then enter the 6-digit code to activate 2FA
+4. **Subsequent logins:** enter the 6-digit code from the Authenticator app
+5. Go to **Settings** → add stocks to your watchlist (e.g. AAPL, MSFT, NVDA)
 3. Go to **AI Advisor** → click **Run Analysis**
-4. Review recommendations and **Approve** or **Reject** them
-5. Approved orders are executed automatically by the paper broker
-6. Track your portfolio on the **Dashboard** and **Portfolio** pages
+6. Review recommendations and **Approve** or **Reject** them
+7. Approved orders are executed automatically by the paper broker
+8. Track your portfolio on the **Dashboard** and **Portfolio** pages
 
 ### Auto Management (optional)
 
@@ -84,6 +98,7 @@ Enable fully autonomous trading in **Settings → AI Strategy → Auto Managemen
 ai-broker/
 ├── backend/
 │   ├── apps/
+│   │   ├── auth_app/        # JWT login + TOTP 2FA
 │   │   ├── ai_advisor/      # AI recommendations & strategy config
 │   │   ├── analytics/       # P&L calculations & metrics
 │   │   ├── market_data/     # Price snapshots & news

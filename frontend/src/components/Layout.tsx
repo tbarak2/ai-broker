@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import clsx from "clsx";
+import { useAppStore } from "../store";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: "📊" },
@@ -10,6 +11,14 @@ const navItems = [
 ];
 
 export default function Layout() {
+  const navigate = useNavigate();
+  const { user, clearAuth } = useAppStore();
+
+  const logout = () => {
+    clearAuth();
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
@@ -40,8 +49,17 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-gray-800 text-xs text-gray-600">
-          Paper trading only — no real money
+        <div className="p-4 border-t border-gray-800 space-y-2">
+          {user && (
+            <p className="text-xs text-gray-500 truncate">{user.username}</p>
+          )}
+          <button
+            onClick={logout}
+            className="w-full text-left text-xs text-gray-500 hover:text-red-400 transition-colors"
+          >
+            Sign out
+          </button>
+          <p className="text-xs text-gray-700">Paper trading only</p>
         </div>
       </aside>
 
