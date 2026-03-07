@@ -9,7 +9,10 @@ env = environ.Env(
     DEBUG=(bool, False),
 )
 
-environ.Env.read_env(os.path.join(BASE_DIR.parent, ".env"))
+try:
+    environ.Env.read_env(os.path.join(BASE_DIR.parent, ".env"))
+except FileNotFoundError:
+    pass  # On Render, env vars are injected directly — no .env file needed
 
 SECRET_KEY = env("SECRET_KEY", default="unsafe-secret-key-change-in-production")
 
