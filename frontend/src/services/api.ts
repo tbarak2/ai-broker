@@ -25,7 +25,7 @@ api.interceptors.response.use(
       const { refreshToken, setTokens, clearAuth } = useAppStore.getState();
       if (refreshToken) {
         try {
-          const res = await axios.post("/api/auth/token/refresh/", {
+          const res = await api.post("/auth/token/refresh/", {
             refresh: refreshToken,
           });
           const { access, refresh } = res.data;
